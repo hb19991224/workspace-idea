@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.dao.BookDao" >
+  <select id="chartBook" resultType="java.util.LinkedHashMap">
+      SELECT DATE_FORMAT(b.btime,'%y')年,count(DATE_FORMAT(b.btime,'%y'))总数 FROM book b group by DATE_FORMAT(b.btime,'%y')
+  </select>
+
+    <select id="brokenBook" resultType="java.util.LinkedHashMap">
+      SELECT DATE_FORMAT(b.btime,'%m')月,count(DATE_FORMAT(b.btime,'%m'))总数 FROM book b group by DATE_FORMAT(b.btime,'%m')
+  </select>
+</mapper>

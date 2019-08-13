@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.dao.UserDao" >
+
+      <select id="login" parameterType="String" resultType="User">
+
+        select * from user where username=#{username}
+      </select>
+
+    <select id="getTreeAll" parameterType="Integer" resultType="tree">
+       SELECT t.* FROM user u,userrole ur,role r,roletree rt,tree t WHERE
+        u.id = ur.uid AND ur.rid = r.id AND r.id = rt.rid AND rt.tid = t.id AND
+         u.id = #{id} order by t.text
+    </select>
+
+    <select id="queryUserCount" parameterType="map" resultType="Integer">
+
+        select count(*) from user
+    </select>
+
+    <select id="queryUser" parameterType="map" resultType="User">
+        select * from user limit #{start},#{end}
+    </select>
+
+    <select id="getRoleByUserId" parameterType="Integer" resultType="Integer">
+        select rid from userrole where uid=#{roleId}
+    </select>
+    
+    <select id="queryRole" resultType="Role">
+        select * from role
+    </select>
+
+    <delete id="deleteRoleById" parameterType="Integer">
+       delete from userrole where uid = #{uidTwo}
+    </delete>
+
+    <insert id="insert" parameterType="UserRole">
+        insert into userrole(uid,rid) values (#{uid},#{rid})
+    </insert>
+
+    <select id="queryRoleCount" parameterType="map" resultType="Integer">
+        select count(*) from role
+    </select>
+
+    <select id="queryRolelist" parameterType="map" resultType="Role">
+        select * from role limit #{start},#{end}
+    </select>
+
+    <select id="getPermissionByRId" parameterType="Integer" resultType="String">
+        select tid from roletree where rid=#{roleId}
+    </select>
+
+    <select id="getPermissionAll" resultType="tree">
+        select * from tree
+    </select>
+
+    <delete id="deleteRolePermissByRid" parameterType="Integer">
+        delete from roletree where rid=#{roleId}
+    </delete>
+
+    <insert id="insertroletree" parameterType="RoleTree">
+        insert into roletree(rid,tid) values (#{rid},#{tid})
+    </insert>
+
+    <select id="queryPermissionCount" parameterType="map" resultType="Integer">
+        select count(*) from tree
+    </select>
+
+    <select id="queryTreelist" parameterType="map" resultType="Tree">
+        select * from tree limit #{start},#{end}
+    </select>
+
+    <select id="query" resultType="role">
+        select * from role
+    </select>
+    
+    <insert id="addrole" parameterType="java.util.List">
+        insert  into role (name,text) values 
+          <foreach collection="list" item="l" separator=",">
+              (#{l.name},#{l.text})
+          </foreach>
+    </insert>
+</mapper>

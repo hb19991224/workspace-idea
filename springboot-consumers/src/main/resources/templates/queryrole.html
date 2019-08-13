@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/demo.css">
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/plugins/jquery.datagrid.js"></script>
+</head>
+<body>
+<input type="button" value="导出Excel" onclick="exportExcel()">
+<form action="../user/importExcel" method="post" enctype="multipart/form-data" >
+    <input type="file" name="file"/>
+    <input type="submit" value="导入excel"/>
+</form>
+
+<!--datagrid 开始  -->
+<table id="dg"></table>
+<!--datagrid 结束 -->
+
+<!-- dialog 对话框 -->
+<div id="updl" class="easyui-dialog" title="菜单" style="width:800px;height:400px;"
+     data-options="iconCls:'icon-save',resizable:true,modal:true">
+    <!-- 下拉树  -->
+    <ul id="et" class="easyui-tree">
+    </ul>
+    <input type="button" value="提交" onclick="updateRolePermiss()" >
+</div>
+<!-- dialog 回显对话框结束 -->
+</body>
+<script type="text/javascript">
+    $(function(){
+        $("#updl").dialog("close");
+        queryData();
+    });
+
+    //导出
+    function exportExcel() {
+        location.href="../user/exportExcel";
+    }
+
+    //查询
+    function queryData(){
+
+        $('#dg').datagrid({
+            url:'../user/queryRole',
+            fitColumns:true,
+            columns:[
+                [
+
+                /* field 属性值和 对象的属性名保持一致 */
+                {field:'xxx',title:'',checkbox:true,width:$(this).width() * 0.2},
+                {field:'id',title:'编号',width:$(this).width() * 0.2},
+                {field:'name',title:'职位名称',width:$(this).width() * 0.2},
+                {field:'text',title:'简介',	width:$(this).width() * 0.2},
+                {field:'xxxx',title:'操作',
+                    formatter: function(value,row,index){
+
+                        var content = "<a href='javascript:editRolePermiss("+row.id+")' class='easyui-linkbutton' iconCls:'icon-cancel'>绑定菜单</a>";
+                        content+="|<a href='javascript:deleteAll("+row.id+")' class='easyui-linkbutton' data-options=iconCls:'icon-cancel'>删除</a>";
+                        return content;
+                    },width:$(this).width() * 0.2}
+            ]
+            ],
+            /* 显示分页工具栏 */
+            pagination:true,
+            /* pageSize 必须和 pagelist 一起连用并且 pagesize的值是pagelist中其中一个 */
+            pageSize:2,
+            pageList:[2,4,6,8]
+        });
+    }
+    //全局变量  供下面使用
+    var roles ;
+    //编辑 角色 所对应  的菜单
+    function editRolePermiss(roleId){
+        roles = roleId;
+        //打开  dilag
+        $("#updl").dialog("open");
+        //加载  所有的  菜单  并且 默认选中  角色 原来 对应的 菜单
+        $('#et').tree({
+            url: '../user/getPermissionByRId?roleId='+roleId,
+            checkbox: true,
+            // 去掉 父子节点 级联
+            cascadeCheck:false,
+        });
+    }
+
+    //编辑  角色 所对应的  菜单
+    function updateRolePermiss(){
+        var perids = getChecked();
+        var roleId = roles;
+        $.ajax({
+            url:"../user/updateRolePermiss",
+            data:{perids:perids,roleId:roleId},
+            type:"post",
+            success:function(data){
+                //代表 成功
+                if(data=='1'){
+                    $("#updl").dialog("close");
+                }else{
+                    alert("失败");
+                }
+            },error:function(){
+            }
+        })
+    }
+
+    function getChecked(){
+        var nodes = $('#et').tree('getChecked');
+        var s = '';
+        for(var i=0; i<nodes.length; i++){
+            if (s != '') s += ',';
+            s += nodes[i].id;
+        }
+        return s;
+    }
+
+</script>
+</html>

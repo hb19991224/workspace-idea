@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/demo.css">
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/plugins/jquery.datagrid.js"></script>
+</head>
+<body>
+
+<!-- dialog 对话框 -->
+<div id="updl" class="easyui-dialog" title="用户角色" style="width:800px;height:400px;"
+     data-options="iconCls:'icon-save',resizable:true,modal:true">
+    <!-- 下拉树  -->
+    <ul id="et" class="easyui-tree">
+    </ul>
+    <input type="button" value="提交" onclick="updateUserRole()" >
+</div>
+<!-- dialog 回显对话框结束 -->
+
+<!--datagrid 开始  -->
+<table id="dg"></table>
+<!--datagrid 结束 -->
+</body>
+<script type="text/javascript">
+    $(function(){
+        //刚进页面dialog是关闭状态
+        $("#updl").dialog("close");
+        queryData();
+    });
+
+    //查询
+    function queryData(){
+
+        $('#dg').datagrid({
+            url:'../user/queryUser',
+            fitColumns:true,
+            columns:[
+                [
+                /* field 属性值和 对象的属性名保持一致 */
+                {field:'xxx',title:'',checkbox:true,width:$(this).width() * 0.2},
+                {field:'id',title:'编号',width:$(this).width() * 0.2},
+                {field:'username',title:'用户名',width:$(this).width() * 0.2},
+                {field:'password',title:'密码',width:$(this).width() * 0.2},
+                {field:'xxxx',title:'操作',
+                    formatter: function(value,row,index){
+
+                        //"<a href='javascript:deleteAll("+row.cid+")' class='easyui-linkbutton' data-options=iconCls:'icon-cancel'>删除</a>";
+                        var content = "<a href='javascript:deleteAll("+row.id+")' class='easyui-linkbutton' iconCls:'icon-cancel'>删除</a>";
+                        content += " | <a href='javascript:huixian("+row.id+")' class='easyui-linkbutton' iconCls='icon-search'>更改</a>";
+                        content +=  " | <a href='javascript:bindRole("+row.id+")' class='easyui-linkbutton' iconCls:'icon-cancel'>绑定角色</a>";
+                        return content;
+                    },width:$(this).width() * 0.2}
+            ]
+            ],
+            /* 显示分页工具栏 */
+            pagination:true,
+            /* pageSize 必须和 pagelist 一起连用并且 pagesize的值是pagelist中其中一个 */
+            pageSize:2,
+            pageList:[2,4,6,8]
+        });
+    }
+
+    var uidTwo;
+    /*  查询 用户对应的 角色 */
+    function bindRole(uid){
+        uidTwo = uid;
+        //开启    dialog
+        $("#updl").dialog("open");
+        //加载  所有的  菜单  并且 默认选中  用户 原来 对应的 角色
+        $('#et').tree({
+            url: '../user/getRoleByUserId?roleId='+uid,
+            checkbox: true,
+            // 去掉 父子节点 级联
+            cascadeCheck:false,
+        });
+    }
+
+    /**
+     * 编辑  用户角色
+     */
+    function  updateUserRole(){
+        var roleIds = getChecked();
+        $.ajax({
+            url:"../user/updateUserRole",
+            data:{roleIds:roleIds,uidTwo:uidTwo},
+            type:"post",
+            success:function(data){
+                //代表 成功
+                if(data=='1'){
+                    $("#updl").dialog("close");
+                }else{
+                    alert("失败");
+                }
+            },error:function(){
+            }
+        })
+    }
+
+
+    function getChecked(){
+        var nodes = $('#et').tree('getChecked');
+        var s = '';
+        for(var i=0; i<nodes.length; i++){
+            if (s != '') s += ',';
+            s += nodes[i].id;
+        }
+        return s;
+    }
+</script>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../highcharts/code/highcharts.js"></script>
+    <script src="../js/jquery.min.js"></script>
+</head>
+<body>
+<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+</body>
+<script type="text/javascript">
+
+    $(function(){
+        $.ajax({
+            url:"../book/brokenBook",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                var chart = Highcharts.chart('container', {
+                    title: {
+                        text: '按月统计线图'
+                    },
+                    subtitle: {
+                        text: '1902B书籍'
+                    },
+                    yAxis: {
+                        title: {
+                            text: '书籍的数量'
+                        }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                    },
+                    series:data,
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                    }
+                });
+            },error:function () {
+                alert("查询失败")
+            }
+        })
+    })
+</script>
+</html>
